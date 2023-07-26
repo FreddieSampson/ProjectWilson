@@ -1,0 +1,120 @@
+﻿@page "/cart"
+@inject ICartService CartService
+
+
+@*Overall, this Razor component creates a dynamic shopping cart page with the ability to view and manage cart items, 
+place an order, and show a thank you message after the order is placed.*@
+
+
+@if (!orderPlaced)@*This is a Razor conditional statement. If the orderPlaced variable is false,
+it executes the code inside the block. Otherwise, it executes the code inside the else block.*@
+{
+    <h3>Swag Bag</h3>
+    @*If the order has not been placed(orderPlaced is false), it displays a heading "Swag Bag" on the page.*@
+
+    @if (cartItems == null || cartItems.Count <= 0) @*This is another conditional statement.It checks if the cartItems list is either null or empty.
+    If it is, it executes the code inside this block.*@
+    {
+            <span>You have no items in your cart.</span>
+    }
+    else @*If the cartItems list is not empty, it executes the code inside this else block.*@
+    {
+            <div>
+            @foreach (var item in cartItems) @*This initiates a foreach loop that iterates through each item in the cartItems list.*@
+            {
+                        <div class="item-container">
+                    <div class="item-image-wrapper"><img src="@item.Image" class="item-image" /></div> @*Displays an image of the item using the src attribute and the Image property of the item.*@
+                            <div class="item-name">
+                        <h5><a href="/product/@item.ProductId">@item.ProductTitle</a></h5> @*Displays the product title of the item as a hyperlink, linking to the corresponding product page.*@
+                            <span>@item.EditionName</span><br /> @*Displays the edition name of the item below the product title.*@
+                                 <button class="btn-delete" @onclick="@(() => DeleteItem(item))">Fly-tip</button>
+                                    @*This creates a "Fly-tip" button for each item. When clicked, it calls the DeleteItem(item) method to remove the corresponding item from the cart.*@
+                                 <EditForm Model="item">
+                            @*This sets up an editing form for each cart item. 
+                            The Model="item" attribute binds the current CartItem object to the form so that any changes made in the form will be reflected in the item object.*@
+                                     <InputNumber id="quantity" @bind-Value="item.Quantity"
+                                      class="form-control" style="width: 70px"/>
+                                      @*This line creates an input field of type number (<InputNumber>) for editing the quantity of the item in the cart. 
+                                          The @bind-Value="item.Quantity" attribute binds the input field's value to the Quantity property of the current item in the loop.*@
+                                 </EditForm>
+                            </div>
+                            <div class="item-price">$@(item.Price * item.Quantity)</div>
+                        </div>
+            }
+                <div class="item-price">
+                    Total (@cartItems.Count): $@cartItems.Sum(item => item.Price * item.Quantity)
+                </div>
+                <div style="text-align: center; margin-top: 10px;">
+                    <button class="btn btn-primary btn-lg" @onclick="PlaceOrder">Place Order</button>
+                </div>
+            </div>
+    }
+} 
+else 
+ @*   The code inside the else block is executed if orderPlaced is true, which means the order has been placed.
+    It displays a thank you message and shows the items in the cart, along with the total price, which includes an additional £500 postage fee.*@
+{
+    <h3>Thank you for your order !!</h3>
+    <h4>Here's what you get:</h4>
+    <h5>Thanks for the £500 postage fee n00b get done lol@u</h5>
+    <div>
+        @foreach (var item in cartItems)
+        {
+            <div class="item-container">
+                <div class="item-image-wrapper"><img src="@item.Image" class="item-image" /></div>
+                <div class="item-name">
+                    <h5><a href="/product/@item.ProductId">@item.ProductTitle</a></h5>
+                    <span>@item.EditionName</span><br />
+                </div>
+                <div class="item-price">$@(item.Price * item.Quantity)</div>
+            </div>
+        }
+        <div class="item-price">
+            Total (@cartItems.Count): $@cartItems.Sum(item => (item.Price * item.Quantity) + 500)
+        </div>
+    </div>
+}
+
+
+
+@code {
+    List<CartItem> cartItems = new List<CartItem>();
+    @*This line declares and initializes a new list of CartItem objects named cartItems.It will be used to store the items in the shopping cart.*@
+
+    bool orderPlaced = false;
+
+    protected override async Task OnInitializedAsync()
+    @*This is an asynchronous method override with the name OnInitializedAsync.It is called when the component is being initialized.*@
+    {
+        cartItems = await CartService.GetCartItems();
+        @*Within the OnInitializedAsync method, this line awaits the result of the GetCartItems method from the CartService class. 
+        It fetches the cart items asynchronously and assigns them to the cartItems list.*@
+    }
+
+    private async Task DeleteItem(CartItem item)
+    @*This line declares a private asynchronous method named DeleteItem.It takes a CartItem object named item as a parameter.*@
+    {
+        await CartService.DeleteItem(item);
+        @*Within the DeleteItem method, this line awaits the result of the DeleteItem method from the CartService class. 
+        It deletes the specified item from the cart asynchronously.*@
+        cartItems = await CartService.GetCartItems();
+        @*After deleting the item, this line awaits the result of the GetCartItems method from the CartService class again. 
+        It fetches the updated cart items asynchronously and assigns them to the cartItems list.*@
+    }
+
+    private async Task PlaceOrder()
+   @* This line declares a private asynchronous method named PlaceOrder.It will be called when the "Place Order" button is clicked.*@
+    {
+        orderPlaced = true;
+        @*This line declares a private asynchronous method named PlaceOrder.It will be called when the "Place Order" button is clicked.*@
+        await CartService.EmptyCart();
+        @*This line awaits the result of the EmptyCart method from the CartService class. It empties the cart asynchronously, removing all items from the cart.*@
+    }
+}
+@*In summary, the code initializes the cartItems list and the orderPlaced boolean variable in the C# code section of the Razor component. It also defines three methods: OnInitializedAsync, DeleteItem, and PlaceOrder.
+
+OnInitializedAsync: This method is responsible for fetching the cart items from the CartService asynchronously when the component is initialized.
+
+DeleteItem: This method deletes a specific CartItem from the cart asynchronously using the CartService and then fetches the updated cart items.
+
+PlaceOrder: This method marks that an order has been placed (orderPlaced = true) and empties the cart using the CartService asynchronously.*@

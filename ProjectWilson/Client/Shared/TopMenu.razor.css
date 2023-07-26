@@ -1,0 +1,29 @@
+﻿.topbar-container {
+    max-width: 100%;
+}
+.top-row[b-50yjvwf0qd] a {
+    margin-left: 0px !important;
+}
+.site-logo {
+    display: inline-flex;
+    margin-top: 1px;
+}
+.site-icon {
+    padding-right: 10px;
+}
+.site-title{
+    font-size: 1.9rem;
+    padding: 0px;
+}
+a.site-logo {
+    color: white;
+}
+a.site-logo:hover {
+    text-decoration: none!important;
+}
+nav.site-nav {
+    padding-top: 5px;
+}
+a.nav-link.menu-catergory-item {
+    color: white !important;
+}

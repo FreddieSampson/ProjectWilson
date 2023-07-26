@@ -1,0 +1,32 @@
+﻿@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthStateProvider
+
+<div class="col-2">
+
+</div>
+<div class="col-8" style="display: inline-flex;">
+    <AuthorizeView>
+        <NotAuthorized>
+            <NavLink class="nav-link" href="login">
+                <span class="oi oi-account-login" aria-hidden="true"></span> Login
+            </NavLink>
+        </NotAuthorized>
+        <Authorized>
+            <a class="nav-link" @onclick="Logout" style="cursor: pointer">
+                <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
+            </a>
+        </Authorized>
+    </AuthorizeView>
+    <AccountInfoName />
+</div>
+<div class="col-2">
+
+</div>
+
+@code {
+    private async void Logout()
+    {
+        await LocalStorage.RemoveItemAsync("username");
+        await AuthStateProvider.GetAuthenticationStateAsync();
+    }
+}

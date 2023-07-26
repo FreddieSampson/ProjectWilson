@@ -1,0 +1,11 @@
+﻿.views {
+    font-size: 12px;
+    color: gray;
+    text-align: right;
+}
+.media-individual {
+    background-color: #ebebeb;
+    display: inline-flex;
+    width: 100%;
+    padding: 30px;
+}

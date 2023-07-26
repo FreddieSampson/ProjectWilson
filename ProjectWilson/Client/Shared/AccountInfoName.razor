@@ -1,0 +1,16 @@
+﻿@inject ISyncLocalStorageService LocalStorage;
+
+<div class="account-info-name-container">
+    <AuthorizeView>
+        <NotAuthorized>
+            <p class="account-info-name-text">You are not logged in</p>
+        </NotAuthorized>
+        <Authorized>
+            <p class="account-info-name-text">You are logged in as: @LocalStorage.GetItemAsString("username")</p>
+        </Authorized>
+    </AuthorizeView>
+</div>
+
+@code {
+
+}
